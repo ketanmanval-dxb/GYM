@@ -1,0 +1,174 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---------- Theme tokens (RGB channels so Tailwind opacity works) ---------- */
+:root,
+.dark {
+  --bg: 7 9 13;
+  --surface: 16 20 27;
+  --ink: 240 244 248;
+  --muted: 140 150 168;
+  --line: 255 255 255;
+  --lime: 198 255 61;
+  --cyan: 34 228 255;
+  --ember: 255 122 69;
+  --danger: 255 92 112;
+  --glass: 255 255 255;
+  --glass-a: 0.045;
+  --line-a: 0.08;
+  --on-accent: 7 9 13;
+  color-scheme: dark;
+}
+
+.light {
+  --bg: 244 246 241;
+  --surface: 255 255 255;
+  --ink: 14 17 22;
+  --muted: 92 100 114;
+  --line: 14 17 22;
+  --lime: 101 163 13;
+  --cyan: 8 145 178;
+  --ember: 234 88 12;
+  --danger: 220 38 38;
+  --glass: 255 255 255;
+  --glass-a: 0.72;
+  --line-a: 0.08;
+  --on-accent: 255 255 255;
+  color-scheme: light;
+}
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    @apply bg-bg text-ink font-sans antialiased;
+    min-height: 100dvh;
+    transition: background-color 0.4s ease, color 0.4s ease;
+  }
+  h1, h2, h3, h4 {
+    @apply font-display tracking-tight;
+  }
+  ::selection {
+    background: rgb(var(--lime) / 0.35);
+  }
+  *:focus-visible {
+    outline: 2px solid rgb(var(--lime));
+    outline-offset: 2px;
+    border-radius: 10px;
+  }
+}
+
+@layer components {
+  .glass {
+    background: rgb(var(--glass) / var(--glass-a));
+    border: 1px solid rgb(var(--line) / var(--line-a));
+    backdrop-filter: blur(18px) saturate(140%);
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
+    @apply rounded-3xl shadow-card;
+  }
+  .text-gradient {
+    background: linear-gradient(100deg, #c6ff3d 0%, #7dffa8 45%, #22e4ff 100%);
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .light .text-gradient {
+    background-image: linear-gradient(100deg, #4d8a00 0%, #0f9f6e 45%, #0784a3 100%);
+  }
+  .bg-gradient-brand {
+    background: linear-gradient(110deg, #c6ff3d 0%, #7dffa8 50%, #22e4ff 100%);
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl px-5 py-3 font-semibold
+      transition-all duration-200 active:scale-[0.97] disabled:opacity-50 disabled:pointer-events-none select-none;
+  }
+  .btn-primary {
+    @apply btn bg-gradient-brand text-[#07090D] shadow-glow hover:brightness-110 hover:-translate-y-0.5;
+  }
+  .btn-ghost {
+    @apply btn border border-line/10 bg-line/[0.04] text-ink hover:bg-line/[0.08];
+  }
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition-all duration-200
+      border border-line/10 text-muted hover:text-ink hover:border-line/20 whitespace-nowrap;
+  }
+  .chip-active {
+    @apply border-transparent bg-lime text-[rgb(var(--on-accent))] hover:text-[rgb(var(--on-accent))];
+  }
+  .eyebrow {
+    @apply text-xs font-semibold uppercase tracking-[0.18em] text-muted;
+  }
+  .input {
+    @apply w-full rounded-2xl border border-line/10 bg-line/[0.04] px-4 py-3 text-sm text-ink outline-none transition
+      placeholder:text-muted focus:border-lime/50 focus:bg-line/[0.06];
+  }
+  .skeleton {
+    @apply relative overflow-hidden rounded-xl bg-line/[0.07];
+  }
+  .skeleton::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(90deg, transparent, rgb(var(--lime) / 0.08), transparent);
+    animation: skeleton-sweep 1.4s ease-in-out infinite;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+}
+
+/* Ambient glowing backdrop */
+.ambient::before,
+.ambient::after {
+  content: '';
+  position: fixed;
+  z-index: -1;
+  border-radius: 9999px;
+  filter: blur(110px);
+  pointer-events: none;
+}
+.ambient::before {
+  width: 520px;
+  height: 520px;
+  top: -180px;
+  left: -120px;
+  background: rgb(var(--lime) / 0.16);
+}
+.ambient::after {
+  width: 560px;
+  height: 560px;
+  bottom: -220px;
+  right: -160px;
+  background: rgb(var(--cyan) / 0.13);
+}
+
+.grid-bg {
+  background-image: linear-gradient(rgb(var(--line) / 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(var(--line) / 0.05) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse at 50% 30%, black 20%, transparent 70%);
+}
+
+@keyframes skeleton-sweep {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.recharts-cartesian-axis-tick-value {
+  font-family: Inter, sans-serif;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
