@@ -46,7 +46,7 @@ export default function Profile() {
                 <p className="text-sm text-muted">{user.handle}</p>
               </div>
             </div>
-            <span className="inline-flex items-center gap-2 self-start rounded-full border border-[#F5A524]/40 bg-[#F5A524]/10 px-4 py-2 text-sm font-semibold text-[#F5A524] sm:self-auto">
+            <span className="inline-flex items-center gap-2 self-start rounded-full border border-[#F5A524]/40 bg-[#F5A524]/10 px-4 py-2 text-sm font-semibold text-[#8A5200] dark:text-[#F5A524] sm:self-auto">
               <Crown className="h-4 w-4" /> {user.membership} member
             </span>
           </div>

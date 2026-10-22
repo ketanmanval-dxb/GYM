@@ -3,3 +3,6 @@ dist
 .vercel
 .env
 .localdb
+test-results
+playwright-report
+*.code-workspace

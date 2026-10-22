@@ -10,9 +10,16 @@ function secret() {
   return new TextEncoder().encode(s)
 }
 
-function cookie(value, maxAge) {
+// A second, non-secret cookie lets the browser know a session *may* exist, so logged-out
+// visitors skip the /api/auth/me call (and its 401 in the console). It grants no access.
+const HINT = 'pf_auth'
+
+function cookies(value, maxAge) {
   const secure = process.env.VERCEL || process.env.NODE_ENV === 'production' ? '; Secure' : ''
-  return `${COOKIE}=${value}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${maxAge}${secure}`
+  return [
+    `${COOKIE}=${value}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${maxAge}${secure}`,
+    `${HINT}=${value ? '1' : ''}; Path=/; SameSite=Lax; Max-Age=${maxAge}${secure}`,
+  ]
 }
 
 export async function startSession(res, userId) {
@@ -22,11 +29,11 @@ export async function startSession(res, userId) {
     .setIssuedAt()
     .setExpirationTime(`${MAX_AGE}s`)
     .sign(secret())
-  res.setHeader('Set-Cookie', cookie(token, MAX_AGE))
+  res.setHeader('Set-Cookie', cookies(token, MAX_AGE))
 }
 
 export function endSession(res) {
-  res.setHeader('Set-Cookie', cookie('', 0))
+  res.setHeader('Set-Cookie', cookies('', 0))
 }
 
 /** Returns the logged-in user's id, or throws 401. */

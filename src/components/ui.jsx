@@ -4,6 +4,7 @@ import { Moon, Sun, Quote, DatabaseZap, AlertTriangle, RotateCw } from 'lucide-r
 import { useTheme } from '../context/ThemeContext'
 import { quoteOfTheDay } from '../data/mock'
 import { isConnectionError } from '../lib/api'
+import { ringFraction } from '../lib/progress'
 
 export function GlassCard({ children, className = '', hover = true, delay = 0, ...rest }) {
   return (
@@ -46,7 +47,7 @@ export function Counter({ value, duration = 1.6, decimals = 0, compact = false, 
 export function ProgressRing({ value, max, size = 120, stroke = 10, color = 'lime', children, delay = 0 }) {
   const r = (size - stroke) / 2
   const c = 2 * Math.PI * r
-  const pct = Math.min(value / max, 1)
+  const pct = ringFraction(value, max)
   const id = `ring-${color}`
   const grads = {
     lime: ['#C6FF3D', '#7DFFA8'],

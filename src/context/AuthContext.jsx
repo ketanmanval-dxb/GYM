@@ -7,6 +7,11 @@ export function AuthProvider({ children }) {
   const [state, setState] = useState({ user: null, streak: null, loading: true, error: null })
 
   const refresh = useCallback(async () => {
+    // No session hint cookie → definitely logged out; skip the request (and a 401 in the console).
+    if (!/(?:^|;\s*)pf_auth=1/.test(document.cookie)) {
+      setState({ user: null, streak: null, loading: false, error: null })
+      return
+    }
     try {
       const d = await api(`/api/auth/me?date=${today()}`)
       setState({ user: d.user, streak: d.streak, loading: false, error: null })

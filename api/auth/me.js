@@ -5,7 +5,10 @@ import { loadStreak } from '../_lib/workouts.js'
 
 export default route({
   async GET(req, res) {
-    const userId = await requireUserId(req)
+    const userId = await requireUserId(req).catch((err) => {
+      endSession(res) // expired or invalid: clear both cookies so the browser stops asking
+      throw err
+    })
     const sql = db()
     const [[user], streak] = await Promise.all([
       sql`SELECT * FROM users WHERE id = ${userId}`,

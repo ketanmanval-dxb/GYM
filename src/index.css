@@ -27,9 +27,10 @@
   --ink: 14 17 22;
   --muted: 92 100 114;
   --line: 14 17 22;
-  --lime: 101 163 13;
-  --cyan: 8 145 178;
-  --ember: 234 88 12;
+  /* One shade darker than the dark-theme hues so text meets WCAG AA (4.5:1) on light surfaces */
+  --lime: 63 98 18;
+  --cyan: 14 116 144;
+  --ember: 168 50 8;
   --danger: 220 38 38;
   --glass: 255 255 255;
   --glass-a: 0.72;

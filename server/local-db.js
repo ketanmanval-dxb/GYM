@@ -7,8 +7,10 @@ import { PGlite } from '@electric-sql/pglite'
 
 let pg
 
+// PULSEFIT_LOCAL_DB can point somewhere else; "memory://" gives a throwaway database for tests.
 export async function openLocalDb(root) {
-  pg ??= await PGlite.create(path.join(root, '.localdb'))
+  const target = process.env.PULSEFIT_LOCAL_DB || path.join(root, '.localdb')
+  pg ??= await PGlite.create(target)
   return pg
 }
 

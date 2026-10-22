@@ -155,7 +155,7 @@ export default function Library() {
               className={`chip ${group === g ? 'chip-active' : ''}`}
             >
               {g}
-              <span className="text-xs opacity-60">
+              <span className="text-xs opacity-80">
                 {g === 'All' ? exercises.length : exercises.filter((e) => e.muscle_group === g).length}
               </span>
             </button>

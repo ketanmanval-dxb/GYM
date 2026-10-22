@@ -44,15 +44,22 @@ export function route(methods) {
 }
 
 export function body(req) {
-  if (!req.body) return {}
-  if (typeof req.body === 'string') {
+  let raw
+  try {
+    raw = req.body // on Vercel this getter throws on malformed JSON
+  } catch {
+    throw new HttpError(400, 'Invalid JSON body')
+  }
+  if (!raw) return {}
+  if (typeof raw === 'string') {
     try {
-      return JSON.parse(req.body)
+      return JSON.parse(raw)
     } catch {
       throw new HttpError(400, 'Invalid JSON body')
     }
   }
-  return req.body
+  if (typeof raw !== 'object' || Array.isArray(raw)) throw new HttpError(400, 'Invalid JSON body')
+  return raw
 }
 
 export function parseCookies(req) {

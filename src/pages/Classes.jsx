@@ -70,7 +70,7 @@ export default function Classes() {
             >
               {active && <motion.span layoutId="day-pill" className="absolute inset-0 rounded-2xl bg-lime" transition={{ type: 'spring', stiffness: 400, damping: 32 }} />}
               <span className="relative text-sm font-semibold">{d}</span>
-              <span className="relative mt-0.5 text-[11px] opacity-70">{count} classes</span>
+              <span className="relative mt-0.5 text-[11px]">{count} classes</span>
               {d === todayKey() && <span className={`relative mt-1 h-1 w-1 rounded-full ${active ? 'bg-current' : 'bg-lime'}`} />}
             </button>
           )

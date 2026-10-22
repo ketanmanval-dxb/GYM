@@ -1,4 +1,5 @@
-import { NavLink, Outlet, useLocation, useNavigate, Link } from 'react-router-dom'
+import { useState } from 'react'
+import { NavLink, useOutlet, useLocation, useNavigate, Link } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { LayoutDashboard, Dumbbell, Timer, TrendingUp, CalendarDays, UserRound, Flame, LogOut } from 'lucide-react'
 import Logo from './Logo'
@@ -11,13 +12,14 @@ function useLogout() {
   const toast = useToast()
   const navigate = useNavigate()
   return async () => {
+    // Leave the protected page first, otherwise the auth guard sends us to /login
+    navigate('/', { replace: true })
     try {
       await logout()
       toast({ type: 'info', title: 'Logged out', message: 'See you at your next session 👋' })
     } catch {
       toast({ type: 'error', title: 'Logout didn’t reach the server', message: 'You’ve been signed out on this device.' })
     }
-    navigate('/', { replace: true })
   }
 }
 
@@ -110,7 +112,7 @@ function Sidebar() {
             <LogoutButton />
           </div>
         </div>
-        <p className="px-1 text-[11px] text-muted/70">© {new Date().getFullYear()} PulseFit</p>
+        <p className="px-1 text-[11px] text-muted">© {new Date().getFullYear()} PulseFit</p>
       </div>
     </aside>
   )
@@ -127,11 +129,11 @@ function MobileTopBar() {
         <LogoutButton />
         <Link
           to="/profile"
-          aria-label={`Profile: ${user.full_name}`}
           title={user.full_name}
           className="grid h-10 w-10 place-items-center rounded-full bg-gradient-brand font-display text-sm font-bold text-[#07090D]"
         >
-          {initialsOf(user.full_name)}
+          <span aria-hidden="true">{initialsOf(user.full_name)}</span>
+          <span className="sr-only">Profile: {user.full_name}</span>
         </Link>
       </div>
     </header>
@@ -177,6 +179,14 @@ function BottomNav() {
   )
 }
 
+// Keeps the page that was on screen when this transition wrapper mounted. Without it, the
+// fading-out wrapper would render the *new* route too, so every page mounted (and fetched) twice.
+function FrozenOutlet() {
+  const outlet = useOutlet()
+  const [frozen] = useState(outlet)
+  return frozen
+}
+
 export default function Layout() {
   const location = useLocation()
   return (
@@ -193,10 +203,11 @@ export default function Layout() {
             transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
             className="mx-auto max-w-6xl px-4 pt-6 sm:px-6 lg:px-10 lg:pt-10"
           >
-            <Outlet />
+            <FrozenOutlet />
           </motion.div>
         </AnimatePresence>
       </main>
+      <BottomNav />
     </div>
   )
 }

@@ -24,7 +24,7 @@ function GoalPicker({ icon: Icon, label, options, value, onChange, unit }) {
             className={`chip ${value === o ? 'chip-active' : ''}`}
           >
             {o}
-            {unit && <span className="text-xs opacity-70">{unit}</span>}
+            {unit && <span className="text-xs opacity-80">{unit}</span>}
           </button>
         ))}
       </div>

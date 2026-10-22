@@ -48,7 +48,7 @@ export async function loadWorkout(sql, userId, date) {
   return { ...w, subtitle: groups.join(' · '), total_sets: totalSets, done_sets: doneSets, est_minutes: estMinutes }
 }
 
-const addDays = (iso, n) => {
+export const addDays = (iso, n) => {
   const d = new Date(`${iso}T00:00:00Z`)
   d.setUTCDate(d.getUTCDate() + n)
   return d.toISOString().slice(0, 10)
@@ -61,7 +61,12 @@ export async function loadStreak(sql, userId, today) {
     FROM workouts
     WHERE user_id = ${userId} AND status = 'completed' AND workout_date <= ${today}::date
     ORDER BY d DESC`
-  const days = new Set(rows.map((r) => r.d))
+  return computeStreak(rows.map((r) => r.d), today)
+}
+
+/** Pure streak maths on a list of 'YYYY-MM-DD' dates that had a completed workout. */
+export function computeStreak(dates, today) {
+  const days = new Set(dates.filter((d) => d <= today))
 
   let current = 0
   let cursor = days.has(today) ? today : addDays(today, -1)

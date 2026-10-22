@@ -61,7 +61,7 @@ function RestTimer({ rest, onToggle, onReset, onAdd, onSkip }) {
         </svg>
         <div className="absolute inset-0 grid place-items-center text-center">
           <div>
-            <p className="font-display text-6xl font-bold tabular-nums sm:text-7xl">{fmt(rest.remaining)}</p>
+            <p data-testid="rest-remaining" className="font-display text-6xl font-bold tabular-nums sm:text-7xl">{fmt(rest.remaining)}</p>
             <p className="mt-1 text-sm text-muted">{idle ? 'Tick a set to start' : `of ${fmt(rest.total)}`}</p>
           </div>
         </div>
@@ -73,8 +73,8 @@ function RestTimer({ rest, onToggle, onReset, onAdd, onSkip }) {
         <button onClick={onToggle} disabled={idle || rest.remaining === 0} className="btn-primary !h-16 !w-16 !rounded-full !p-0" aria-label={rest.running ? 'Pause' : 'Resume'}>
           {rest.running ? <Pause className="h-6 w-6 fill-current" /> : <Play className="h-6 w-6 fill-current" />}
         </button>
-        <button onClick={onAdd} disabled={idle} className="btn-ghost !h-12 !px-3 text-sm" aria-label="Add 15 seconds">
-          <Plus className="h-4 w-4" />15s
+        <button onClick={onAdd} disabled={idle} className="btn-ghost !h-12 !px-3 text-sm">
+          <Plus className="h-4 w-4" />15s<span className="sr-only"> more rest</span>
         </button>
         <button onClick={onSkip} disabled={idle || rest.remaining === 0} className="btn-ghost !h-12 !w-12 !p-0" aria-label="Skip rest">
           <SkipForward className="h-5 w-5" />
@@ -202,8 +202,14 @@ function Session({ workout, date, onClosed }) {
     if (totalSets > 0 && doneSets === totalSets && !celebrated.current) finish()
   }, [doneSets, totalSets]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // The panel that is really open. A collapsing panel stays on screen for its exit animation,
+  // still showing the old state; taps on it must be ignored or they would undo the last tick.
+  const openRef = useRef(open)
+  openRef.current = open
+
   const toggleSet = (ex, idx) => {
     const key = ex.workout_exercise_id
+    if (openRef.current !== key) return
     const wasDone = done[key][idx]
     const nextSets = done[key].map((v, i) => (i === idx ? !v : v))
 
@@ -275,7 +281,7 @@ function Session({ workout, date, onClosed }) {
         </div>
       </div>
 
-      <div className="mb-6 h-2.5 overflow-hidden rounded-full bg-line/[0.08]" role="progressbar" aria-valuenow={Math.round(progress * 100)} aria-valuemin={0} aria-valuemax={100}>
+      <div className="mb-6 h-2.5 overflow-hidden rounded-full bg-line/[0.08]" role="progressbar" aria-label="Workout progress" aria-valuenow={Math.round(progress * 100)} aria-valuemin={0} aria-valuemax={100}>
         <motion.div className="h-full rounded-full bg-gradient-brand" animate={{ width: `${progress * 100}%` }} transition={{ type: 'spring', stiffness: 120, damping: 20 }} />
       </div>
 
