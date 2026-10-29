@@ -168,6 +168,29 @@ test('Dashboard updates: streak, chart and rings show the new workout', async ()
   await expectAccessible(page, 'dashboard (after workout)')
 })
 
+test('Dashboard: chart bars grow and progress rings fill on load', async () => {
+  // Record every frame: an animation that restarts from its end state looks like a jump, not a grow.
+  await page.addInitScript(() => {
+    window.__bars = []
+    window.__ring = []
+    const tick = () => {
+      const bar = document.querySelector('.recharts-bar-rectangle path')
+      if (bar) window.__bars.push(Math.round(bar.getBoundingClientRect().height))
+      const ring = [...document.querySelectorAll('main svg circle')].find((c) => c.getAttribute('stroke-dasharray'))
+      if (ring) window.__ring.push(Math.round(parseFloat(getComputedStyle(ring).strokeDashoffset)))
+      if (performance.now() < 6000) requestAnimationFrame(tick)
+    }
+    requestAnimationFrame(tick)
+  })
+  await page.reload()
+  await page.waitForTimeout(3000)
+  const { bars, ring } = await page.evaluate(() => ({ bars: [...new Set(window.__bars)], ring: [...new Set(window.__ring)] }))
+  expect(bars.length, `bar heights seen: ${bars.join(',')}`).toBeGreaterThan(5)
+  expect(bars.at(-1)).toBeGreaterThan(bars[0])
+  expect(ring.length, `ring offsets seen: ${ring.join(',')}`).toBeGreaterThan(5)
+  expect(ring.at(-1)).toBeLessThan(ring[0])
+})
+
 test('refresh: the data is still there', async () => {
   await page.reload()
   await expectDashboardShowsWorkout()

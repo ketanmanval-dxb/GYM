@@ -54,6 +54,7 @@ function RestTimer({ rest, onToggle, onReset, onAdd, onSkip }) {
             strokeWidth={stroke}
             strokeLinecap="round"
             strokeDasharray={c}
+            initial={{ strokeDashoffset: c }}
             animate={{ strokeDashoffset: c * (1 - pct) }}
             transition={{ duration: rest.running ? 1 : 0.4, ease: 'linear' }}
             style={{ filter: 'drop-shadow(0 0 10px rgba(198,255,61,0.45))' }}

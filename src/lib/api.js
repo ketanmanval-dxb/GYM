@@ -1,5 +1,5 @@
 // Browser-side API client. The frontend only ever talks to /api; it never sees the database.
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 export class ApiError extends Error {
   constructor(status, message, code) {
@@ -51,14 +51,19 @@ export const isConnectionError = (e) => ['DB_UNAVAILABLE', 'DB_NOT_SETUP', 'NETW
 /** Loads a GET endpoint. `setData` allows optimistic local updates. */
 export function useApi(path) {
   const [state, setState] = useState({ data: null, error: null, loading: true })
+  // Only the newest request may set state. Otherwise a slower, older response (e.g. the duplicate
+  // load React's StrictMode does in development) replaces the data a moment after the page draws,
+  // which restarts chart animations from their end state.
+  const latest = useRef(0)
 
   const reload = useCallback(async () => {
+    const id = ++latest.current
     setState((s) => ({ ...s, loading: !s.data, error: null }))
     try {
       const data = await api(path)
-      setState({ data, error: null, loading: false })
+      if (id === latest.current) setState({ data, error: null, loading: false })
     } catch (error) {
-      setState({ data: null, error, loading: false })
+      if (id === latest.current) setState({ data: null, error, loading: false })
     }
   }, [path])
 
